@@ -181,6 +181,25 @@ public class DataAccess {
         return municipis;
     }
 
+    public int getEspaisCount(String searchString) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS count_espais"
+                + " FROM dbo.espais JOIN dbo.municipis ON dbo.espais.municipi=dbo.municipis.id JOIN dbo.tipus_espai ON dbo.espais.tipus=dbo.tipus_espai.id"
+                + " WHERE visible=1 AND espais.nom LIKE CONCAT('%',?,'%')";
+        try (Connection connection = getConnection();
+                PreparedStatement selectStatement = connection.prepareStatement(sql);) {
+            selectStatement.setString(1, searchString);
+            ResultSet resultSet = selectStatement.executeQuery();
+            while (resultSet.next()) {
+                count = resultSet.getInt("count_espais");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
     public ArrayList<Espai> getEspais(String searchString, int offset) {
         ArrayList<Espai> espais = new ArrayList<>();
         String sql = "SELECT espais.nom, registre, espais.descripcio, municipis.nom AS nom_municipi, adreca, email, web, telefon, tipus_espai.descripcio AS descripcio_espai"
@@ -192,7 +211,7 @@ public class DataAccess {
         try (Connection connection = getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(sql);) {
             selectStatement.setString(1, searchString);
-            selectStatement.setInt(2, offset*10+1);
+            selectStatement.setInt(2, offset * 10);
             ResultSet resultSet = selectStatement.executeQuery();
             while (resultSet.next()) {
                 Espai espai = new Espai();
@@ -398,9 +417,9 @@ public class DataAccess {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         return result == 1 ? true : false;
-    }    
+    }
 
     public boolean updateUserProfilePicture(int userId, ImageIcon icon) {
         int result = 0;
@@ -419,5 +438,5 @@ public class DataAccess {
         return result == 1 ? true : false;
 
     }
-    
+
 }
