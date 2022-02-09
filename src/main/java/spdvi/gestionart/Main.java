@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -24,6 +25,7 @@ import javax.swing.JOptionPane;
 import spdvi.gestionart.Models.Espai;
 import spdvi.gestionart.Models.Municipi;
 import spdvi.gestionart.Models.Usuari;
+import spdvi.gestionart.dataaccess.ApiClient;
 import spdvi.gestionart.dataaccess.DataAccess;
 import spdvi.gestionart.dialogs.ChangePasswordDialog;
 import spdvi.gestionart.dialogs.EspaiDetailsDialog;
@@ -43,6 +45,9 @@ public class Main extends javax.swing.JFrame {
     int numPagina = 0;
     private static final int NUM_ESPAIS_PER_PAGE = 10;
 
+    private ApiClient apiClient;
+    private Usuari user = null;
+
     /**
      * Creates new form Main
      */
@@ -57,6 +62,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
         dataAccess = new DataAccess();
+        apiClient = new ApiClient();
     }
 
     /**
@@ -340,11 +346,12 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         LoginDialog loginDialog = new LoginDialog(this, true);
-        Usuari user = loginDialog.showDialog();
-        UUID uuid = dataAccess.insertSession(user.getId());
-        SessionSingleton session = SessionSingleton.INSTANCE.getInstance();
-        session.setUuid(uuid);
-        session.setUsuari(user);
+        user = loginDialog.showDialog();
+//        System.err.println(user.getToken());
+        //UUID uuid = dataAccess.insertSession(user.getId());
+//        SessionSingleton session = SessionSingleton.INSTANCE.getInstance();
+        //session.setUuid(uuid);
+//        session.setUsuari(user);
         try {
             jLabel1.setText("<html>" + user.getLlinatges() + " from " + InetAddress.getLocalHost().toString() + " logged in.</html>");
         } catch (UnknownHostException ex) {
@@ -355,38 +362,51 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        ArrayList<Municipi> municipis = dataAccess.getMunicipis();
-        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-        for (Municipi m : municipis) {
-            comboBoxModel.addElement(m);
+//        ArrayList<Municipi> municipis = dataAccess.getMunicipis();
+        ArrayList<Municipi> municipis;
+        try {
+            municipis = apiClient.getMunicipis(user.getToken());
+            DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+            for (Municipi m : municipis) {
+                comboBoxModel.addElement(m);
+            }
+            jComboBox1.setModel(comboBoxModel);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        jComboBox1.setModel(comboBoxModel);
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        pnlPages.removeAll();
-        pnlPages.repaint();
+        
 
-        String searchString = jTextField1.getText();
-        int countEspais = dataAccess.getEspaisCount(searchString);
-        int numPages = countEspais / NUM_ESPAIS_PER_PAGE;
+//        pnlPages.removeAll();
+//        pnlPages.repaint();
 
-        for (int i = 0; i <= numPages; i++) {
-            JButton button = new JButton();
-            button.setText(String.valueOf(i + 1));
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    btnPageActionPerformed(evt, searchString);
-                }
-            });
-            pnlPages.add(button);
-        }
-
-        lblEspaisFound.setText(countEspais + " espais found.");
-        Object button = pnlPages.getComponent(0);
-        if (button instanceof JButton) {
-            ((JButton)button).doClick();
-        }
+//        String searchString = jTextField1.getText();
+//        int countEspais = dataAccess.getEspaisCount(searchString);
+//        int numPages = countEspais / NUM_ESPAIS_PER_PAGE;
+//
+//        for (int i = 0; i <= numPages; i++) {
+//            JButton button = new JButton();
+//            button.setText(String.valueOf(i + 1));
+//            button.addActionListener(new ActionListener() {
+//                public void actionPerformed(ActionEvent evt) {
+//                    btnPageActionPerformed(evt, searchString);
+//                }
+//            });
+//            pnlPages.add(button);
+//        }
+//
+//        lblEspaisFound.setText(countEspais + " espais found.");
+//        Object button = pnlPages.getComponent(0);
+//        if (button instanceof JButton) {
+//            ((JButton) button).doClick();
+//        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnPageActionPerformed(ActionEvent evt, String searchString) {
@@ -398,7 +418,7 @@ public class Main extends javax.swing.JFrame {
                 listModel.addElement(e);
             }
             lstEspais.setModel(listModel);
-            lblShowingEspais.setText("Showing results " + (pageNumber*10+1) + " to " + (pageNumber*10+10));
+            lblShowingEspais.setText("Showing results " + (pageNumber * 10 + 1) + " to " + (pageNumber * 10 + 10));
         }
     }
 

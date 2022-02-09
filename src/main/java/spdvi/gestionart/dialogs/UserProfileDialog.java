@@ -242,7 +242,7 @@ public class UserProfileDialog extends javax.swing.JDialog {
             txtLlinatges.setText(usuari.getLlinatges());
             txtDni.setText(usuari.getDni());
             txtEmail.setText(usuari.getEmail());
-            lblProfilePicture.setIcon(ImageUtils.byteArrayToImage(usuari.getProfilePicture()));
+//            lblProfilePicture.setIcon(ImageUtils.byteArrayToImage(usuari.getProfilePicture()));
         }
     }//GEN-LAST:event_formWindowOpened
 

@@ -4,8 +4,11 @@
  */
 package spdvi.gestionart.dialogs;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import spdvi.gestionart.Models.Usuari;
+import spdvi.gestionart.dataaccess.ApiClient;
 import spdvi.gestionart.dataaccess.DataAccess;
 
 /**
@@ -95,14 +98,19 @@ public class LoginDialog extends javax.swing.JDialog {
     }
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        DataAccess da = new DataAccess();
-        String passwordInDb = da.findUserPassword(txtUser.getText());
-        if (passwordInDb != null && passwordInDb.equals(txtPassword.getText())) {
-            // logged in
-            user = da.getUser(txtUser.getText());
-            setVisible(false);
+        ApiClient apiClient = new ApiClient();
+        user = new Usuari();
+        user.setEmail(txtUser.getText());
+        user.setPassword(txtPassword.getText());
+        
+        try {
+            String token = apiClient.authenticate(user);
+            user.setToken(token);
+            this.setVisible(false);
             dispose();
-        } else {
+            //System.err.println(token);
+        } catch ( Exception ex) {
+            Logger.getLogger(LoginDialog.class.getName()).log(Level.SEVERE, null, ex);
             lblError.setVisible(true);
         }
     }//GEN-LAST:event_btnLoginActionPerformed

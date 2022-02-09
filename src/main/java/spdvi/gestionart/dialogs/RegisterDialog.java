@@ -4,8 +4,13 @@
  */
 package spdvi.gestionart.dialogs;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import spdvi.gestionart.Models.Usuari;
 import spdvi.gestionart.Utils.PasswordHasher;
+import spdvi.gestionart.dataaccess.ApiClient;
 import spdvi.gestionart.dataaccess.DataAccess;
 
 /**
@@ -111,18 +116,28 @@ public class RegisterDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-        DataAccess da = new DataAccess();
-        if (da.getUserId(txtEmail.getText()) == 0) {
-            Usuari newUser = new Usuari();
-            newUser.setNom(txtNom.getText());
-            newUser.setLlinatges(txtLlinatges.getText());
-            newUser.setEmail(txtEmail.getText());
-            newUser.setPassword(txtPassword.getText());
-            newUser.setPasswordHash(PasswordHasher.hashPassword(txtPassword.getText()));
-            int success = da.insertUser(newUser);
-            this.setVisible(false);
-            dispose();
+//        DataAccess da = new DataAccess();
+//        if (da.getUserId(txtEmail.getText()) == 0) {
+        Usuari newUser = new Usuari();
+        newUser.setNom(txtNom.getText());
+        newUser.setLlinatges(txtLlinatges.getText());
+        newUser.setEmail(txtEmail.getText());
+        newUser.setPassword(txtPassword.getText());
+//        newUser.setPasswordHash(PasswordHasher.hashPassword(txtPassword.getText()));
+//            int success = da.insertUser(newUser);
+
+        ApiClient apiClient = new ApiClient();
+        try {
+            Usuari returnUsuari = apiClient.createUser(newUser);
+            if (returnUsuari != null) {
+                this.setVisible(false);
+                dispose();                
+            }
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            Logger.getLogger(RegisterDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+//        }
         lastEmail = txtEmail.getText();
         lblErrorMessage.setVisible(true);
         txtEmail.grabFocus();

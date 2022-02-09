@@ -8,6 +8,17 @@ import spdvi.gestionart.Constants;
  */
 public class Usuari {
 
+    
+    private String token = null;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+    
     public int getId() {
         return id;
     }
@@ -45,23 +56,23 @@ public class Usuari {
     public void setPassword(String password) { 
 		 this.password = password; } 
     String password;
-    public byte[] getPasswordHash() {
-        return passwordHash;
-    }
-    public void setPasswordHash(byte[] passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-    private byte[] passwordHash = new byte[256];
-    
-    private byte[] profilePicture = new byte[Constants.MAX_IMAGE_FILE_SIZE];
-
-    public byte[] getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
-    }
+//    public byte[] getPasswordHash() {
+//        return passwordHash;
+//    }
+//    public void setPasswordHash(byte[] passwordHash) {
+//        this.passwordHash = passwordHash;
+//    }
+//    private byte[] passwordHash = new byte[256];
+//    
+//    private byte[] profilePicture = new byte[Constants.MAX_IMAGE_FILE_SIZE];
+//
+//    public byte[] getProfilePicture() {
+//        return profilePicture;
+//    }
+//
+//    public void setProfilePicture(byte[] profilePicture) {
+//        this.profilePicture = profilePicture;
+//    }
     
     private boolean admin = false;
 

@@ -95,20 +95,18 @@ public class DataAccess {
                 user.setTelefon(resultSet.getString("telefon"));
                 user.setEmail(resultSet.getString("email"));
                 user.setPassword(resultSet.getString("password"));
-                user.setPasswordHash(resultSet.getBytes("password_hash"));
-                InputStream profilePictureIS = resultSet.getBinaryStream("profilePicture");
-                if (profilePictureIS != null) {
-                    user.setProfilePicture(readAllBytes(profilePictureIS));
-                } else {
-                    user.setProfilePicture(null);
-                }
+//                user.setPasswordHash(resultSet.getBytes("password_hash"));
+//                InputStream profilePictureIS = resultSet.getBinaryStream("profilePicture");
+//                if (profilePictureIS != null) {
+//                    user.setProfilePicture(readAllBytes(profilePictureIS));
+//                } else {
+//                    user.setProfilePicture(null);
+//                }
                 user.setAdmin(resultSet.getBoolean("isAdmin"));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (IOException ex) {
-            Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return user;
     }
@@ -122,7 +120,7 @@ public class DataAccess {
             insertStatement.setString(2, user.getLlinatges());
             insertStatement.setString(3, user.getEmail());
             insertStatement.setString(4, user.getPassword());
-            insertStatement.setBytes(5, user.getPasswordHash());
+//            insertStatement.setBytes(5, user.getPasswordHash());
             result = insertStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -160,25 +158,6 @@ public class DataAccess {
             e.printStackTrace();
         }
         return result;
-    }
-
-    public ArrayList<Municipi> getMunicipis() {
-        ArrayList<Municipi> municipis = new ArrayList<>();
-        String sql = "SELECT * FROM dbo.municipis";
-        try (Connection connection = getConnection();
-                PreparedStatement selectStatement = connection.prepareStatement(sql);) {
-            ResultSet resultSet = selectStatement.executeQuery();
-            while (resultSet.next()) {
-                Municipi municipi = new Municipi();
-                municipi.setId(resultSet.getInt("id"));
-                municipi.setNom(resultSet.getString("nom"));
-                municipi.setIlla(resultSet.getString("illa"));
-                municipis.add(municipi);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return municipis;
     }
 
     public int getEspaisCount(String searchString) {
